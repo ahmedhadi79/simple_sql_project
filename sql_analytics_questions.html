@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Study Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141416;
+    --surface2: #1a1a1d;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0ede8;
+    --muted: #888580;
+    --faint: #444240;
+    --accent: #e8c547;
+    --accent2: #4fc08d;
+    --accent3: #e06b6b;
+    --customers: #5b8dee;
+    --products: #9b6dff;
+    --orders: #4fc08d;
+    --advanced: #e8c547;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: 'SQL';
+    position: absolute;
+    right: 40px;
+    top: -20px;
+    font-size: 180px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.02);
+    letter-spacing: -8px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .header p {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 28px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* LAYOUT */
+  .container { padding: 0 60px; margin-top: 48px; }
+
+  /* SECTION */
+  .section { margin-bottom: 56px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .section-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-count {
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 1px;
+  }
+
+  .s-customers .section-dot { background: var(--customers); }
+  .s-customers .section-title { color: var(--customers); }
+  .s-products .section-dot { background: var(--products); }
+  .s-products .section-title { color: var(--products); }
+  .s-orders .section-dot { background: var(--orders); }
+  .s-orders .section-title { color: var(--orders); }
+  .s-advanced .section-dot { background: var(--advanced); }
+  .s-advanced .section-title { color: var(--advanced); }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 2px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .card:hover { background: var(--surface2); border-color: var(--border2); }
+  .card.open { background: var(--surface2); border-color: var(--border2); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--faint);
+    padding-top: 2px;
+    flex-shrink: 0;
+    min-width: 24px;
+  }
+  .card-question {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+    flex: 1;
+  }
+  .card-toggle {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: transform 0.2s, border-color 0.15s;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .card.open .card-toggle {
+    transform: rotate(45deg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* CODE BLOCK */
+  .card-code {
+    display: none;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .card.open .card-code { display: block; }
+
+  pre {
+    background: #0a0a0c;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    position: relative;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #c9c5be;
+  }
+
+  /* Syntax highlight classes */
+  .kw  { color: #e06b6b; }   /* keywords */
+  .fn  { color: #e8c547; }   /* functions */
+  .str { color: #4fc08d; }   /* strings/values */
+  .cm  { color: #555250; font-style: italic; } /* comments */
+  .num { color: #5b8dee; }   /* numbers */
+
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--text); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--faint);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 700px) {
+    .header { padding: 32px 24px 28px; }
+    .container { padding: 0 24px; margin-top: 32px; }
+    .grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 28px; }
+    .header-stats { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Study Reference</div>
+  <h1>SQL Query Sheet</h1>
+  <p>22 analytics questions across Customers, Products, Orders, and multi-table joins. Click any card to reveal the query.</p>
+  <div class="header-stats">
+    <div class="stat"><span class="stat-num">22</span><span class="stat-label">Queries</span></div>
+    <div class="stat"><span class="stat-num">4</span><span class="stat-label">Categories</span></div>
+    <div class="stat"><span class="stat-num">3</span><span class="stat-label">Tables</span></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- CUSTOMERS -->
+  <div class="section s-customers">
+    <div class="section-header">
+      <div class="section-dot"></div>
+      <div class="section-title">Customers</div>
+      <div class="section-line"></div>
+      <div class="section-count">06 questions</div>
+    </div>
+    <div class="grid">
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">01</span>
+          <span class="card-question">How many customers do we have per country?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> country, <span class="fn">COUNT</span>(customerid) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> customers
+<span class="kw">GROUP BY</span> country
+<span class="kw">ORDER BY</span> country <span class="kw">ASC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">02</span>
+          <span class="card-question">Which country has the most customers?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> country, <span class="fn">COUNT</span>(customerid) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> customers
+<span class="kw">GROUP BY</span> country
+<span class="kw">ORDER BY</span> total_customers <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">1</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">03</span>
+          <span class="card-question">How many customers registered each year?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">EXTRACT</span>(year <span class="kw">FROM</span> registrationdate) <span class="kw">AS</span> year_registration,
+       <span class="fn">COUNT</span>(customerid) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> customers
+<span class="kw">GROUP BY</span> year_registration
+<span class="kw">ORDER BY</span> year_registration <span class="kw">ASC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">04</span>
+          <span class="card-question">Who are our 3 newest customers?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(firstname, <span class="str">' '</span>, lastname) <span class="kw">AS</span> customer_name,
+       country, registrationdate
+<span class="kw">FROM</span> customers
+<span class="kw">ORDER BY</span> registrationdate <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">3</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">05</span>
+          <span class="card-question">Which customers have never placed an order?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(firstname, <span class="str">' '</span>, lastname) <span class="kw">AS</span> full_name,
+       country, registrationdate
+<span class="kw">FROM</span> customers
+<span class="kw">WHERE</span> customerid <span class="kw">NOT IN</span> (
+    <span class="kw">SELECT</span> customerid <span class="kw">FROM</span> orders
+);</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">06</span>
+          <span class="card-question">Which customers registered in 2023, and where are they from?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(firstname, <span class="str">' '</span>, lastname) <span class="kw">AS</span> customer_full_name,
+       country,
+       <span class="fn">EXTRACT</span>(year <span class="kw">FROM</span> registrationdate) <span class="kw">AS</span> year_registration
+<span class="kw">FROM</span> customers
+<span class="kw">WHERE</span> <span class="fn">EXTRACT</span>(year <span class="kw">FROM</span> registrationdate) = <span class="num">2023</span>;</code></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="section s-products">
+    <div class="section-header">
+      <div class="section-dot"></div>
+      <div class="section-title">Products</div>
+      <div class="section-line"></div>
+      <div class="section-count">06 questions</div>
+    </div>
+    <div class="grid">
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">07</span>
+          <span class="card-question">What is the average price per product category?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> category, <span class="fn">ROUND</span>(<span class="fn">AVG</span>(price), <span class="num">2</span>) <span class="kw">AS</span> avg_price
+<span class="kw">FROM</span> products
+<span class="kw">GROUP BY</span> category
+<span class="kw">ORDER BY</span> avg_price <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">08</span>
+          <span class="card-question">Which product has the highest price?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> productname, category, price
+<span class="kw">FROM</span> products
+<span class="kw">ORDER BY</span> price <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">1</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">09</span>
+          <span class="card-question">How many products do we have in each category?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> category, <span class="fn">COUNT</span>(productid) <span class="kw">AS</span> total_products
+<span class="kw">FROM</span> products
+<span class="kw">GROUP BY</span> category
+<span class="kw">ORDER BY</span> total_products <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">10</span>
+          <span class="card-question">Which products are running low on stock (below 40 units)?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> productname, category, price, stock
+<span class="kw">FROM</span> products
+<span class="kw">WHERE</span> stock &lt; <span class="num">40</span>
+<span class="kw">ORDER BY</span> stock <span class="kw">ASC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">11</span>
+          <span class="card-question">What is the total inventory value per category?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> category, <span class="fn">SUM</span>(price * stock) <span class="kw">AS</span> inventory_value
+<span class="kw">FROM</span> products
+<span class="kw">GROUP BY</span> category
+<span class="kw">ORDER BY</span> inventory_value <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">12</span>
+          <span class="card-question">Label each product as Expensive, Moderate, or Budget.</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> productname, category, price,
+       <span class="kw">CASE</span>
+           <span class="kw">WHEN</span> price &gt; <span class="num">500</span>             <span class="kw">THEN</span> <span class="str">'Expensive'</span>
+           <span class="kw">WHEN</span> price <span class="kw">BETWEEN</span> <span class="num">100</span> <span class="kw">AND</span> <span class="num">500</span> <span class="kw">THEN</span> <span class="str">'Moderate'</span>
+           <span class="kw">ELSE</span> <span class="str">'Budget'</span>
+       <span class="kw">END AS</span> price_label
+<span class="kw">FROM</span> products
+<span class="kw">ORDER BY</span> price <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="section s-orders">
+    <div class="section-header">
+      <div class="section-dot"></div>
+      <div class="section-title">Orders</div>
+      <div class="section-line"></div>
+      <div class="section-count">05 questions</div>
+    </div>
+    <div class="grid">
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">13</span>
+          <span class="card-question">What is the total revenue generated from all orders?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">SUM</span>(p.price * o.quantity) <span class="kw">AS</span> total_revenue
+<span class="kw">FROM</span> orders o
+<span class="kw">JOIN</span> products p <span class="kw">ON</span> p.productid = o.productid;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">14</span>
+          <span class="card-question">How many orders were placed each month in 2023?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">EXTRACT</span>(month <span class="kw">FROM</span> orderdate) <span class="kw">AS</span> month,
+       <span class="fn">COUNT</span>(orderid) <span class="kw">AS</span> total_orders
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> <span class="fn">EXTRACT</span>(year <span class="kw">FROM</span> orderdate) = <span class="num">2023</span>
+<span class="kw">GROUP BY</span> <span class="num">1</span>
+<span class="kw">ORDER BY</span> month;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">15</span>
+          <span class="card-question">Which customer has spent the most money overall?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(c.firstname, <span class="str">' '</span>, c.lastname) <span class="kw">AS</span> full_name,
+       c.country, <span class="fn">SUM</span>(p.price * o.quantity) <span class="kw">AS</span> total_spent
+<span class="kw">FROM</span> customers c
+<span class="kw">JOIN</span> orders o   <span class="kw">ON</span> c.customerid = o.customerid
+<span class="kw">JOIN</span> products p <span class="kw">ON</span> p.productid  = o.productid
+<span class="kw">GROUP BY</span> c.customerid, c.firstname, c.lastname, c.country
+<span class="kw">ORDER BY</span> total_spent <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">1</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">16</span>
+          <span class="card-question">What is our best-selling product by quantity?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> p.productname, p.category,
+       <span class="fn">SUM</span>(o.quantity) <span class="kw">AS</span> total_quantity_sold
+<span class="kw">FROM</span> products p
+<span class="kw">JOIN</span> orders o <span class="kw">ON</span> p.productid = o.productid
+<span class="kw">GROUP BY</span> p.productid, p.productname, p.category
+<span class="kw">ORDER BY</span> total_quantity_sold <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">1</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">17</span>
+          <span class="card-question">Which product category generates the most revenue?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> p.category, <span class="fn">SUM</span>(p.price * o.quantity) <span class="kw">AS</span> total_revenue
+<span class="kw">FROM</span> products p
+<span class="kw">JOIN</span> orders o <span class="kw">ON</span> p.productid = o.productid
+<span class="kw">GROUP BY</span> p.category
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">1</span>;</code></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADVANCED -->
+  <div class="section s-advanced">
+    <div class="section-header">
+      <div class="section-dot"></div>
+      <div class="section-title">Advanced — Multi-table</div>
+      <div class="section-line"></div>
+      <div class="section-count">05 questions</div>
+    </div>
+    <div class="grid">
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">18</span>
+          <span class="card-question">Show each customer's name, products bought, and total spend per order.</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(c.firstname, <span class="str">' '</span>, c.lastname) <span class="kw">AS</span> full_name,
+       p.productname, o.quantity, p.price,
+       (p.price * o.quantity) <span class="kw">AS</span> order_total
+<span class="kw">FROM</span> customers c
+<span class="kw">JOIN</span> orders o   <span class="kw">ON</span> c.customerid = o.customerid
+<span class="kw">JOIN</span> products p <span class="kw">ON</span> p.productid  = o.productid
+<span class="kw">ORDER BY</span> order_total <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">19</span>
+          <span class="card-question">Which countries generate the most revenue (over $500)?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> c.country, <span class="fn">SUM</span>(p.price * o.quantity) <span class="kw">AS</span> total_revenue
+<span class="kw">FROM</span> customers c
+<span class="kw">JOIN</span> orders o   <span class="kw">ON</span> c.customerid = o.customerid
+<span class="kw">JOIN</span> products p <span class="kw">ON</span> p.productid  = o.productid
+<span class="kw">GROUP BY</span> c.country
+<span class="kw">HAVING</span> <span class="fn">SUM</span>(p.price * o.quantity) &gt; <span class="num">500</span>
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">20</span>
+          <span class="card-question">How many orders has each customer placed, including those with zero orders?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> <span class="fn">CONCAT</span>(c.firstname, <span class="str">' '</span>, c.lastname) <span class="kw">AS</span> full_name,
+       c.country, <span class="fn">COUNT</span>(o.orderid) <span class="kw">AS</span> total_orders
+<span class="kw">FROM</span> customers c
+<span class="kw">LEFT JOIN</span> orders o <span class="kw">ON</span> c.customerid = o.customerid
+<span class="kw">GROUP BY</span> c.customerid, c.firstname, c.lastname, c.country
+<span class="kw">ORDER BY</span> total_orders <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">21</span>
+          <span class="card-question">Are there any products that have never been ordered?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> productname, category, price, stock
+<span class="kw">FROM</span> products
+<span class="kw">WHERE</span> productid <span class="kw">NOT IN</span> (
+    <span class="kw">SELECT</span> productid <span class="kw">FROM</span> orders
+);</code></pre>
+        </div>
+      </div>
+
+      <div class="card" onclick="toggle(this)">
+        <div class="card-top">
+          <span class="card-num">22</span>
+          <span class="card-question">What is the average order value per country?</span>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-code">
+          <pre><button class="copy-btn" onclick="copyCode(event, this)">COPY</button><code><span class="kw">SELECT</span> c.country,
+       <span class="fn">ROUND</span>(<span class="fn">AVG</span>(p.price * o.quantity), <span class="num">2</span>) <span class="kw">AS</span> avg_order_value
+<span class="kw">FROM</span> customers c
+<span class="kw">JOIN</span> orders o   <span class="kw">ON</span> c.customerid = o.customerid
+<span class="kw">JOIN</span> products p <span class="kw">ON</span> p.productid  = o.productid
+<span class="kw">GROUP BY</span> c.country
+<span class="kw">ORDER BY</span> avg_order_value <span class="kw">DESC</span>;</code></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">22 queries &nbsp;·&nbsp; PostgreSQL &nbsp;·&nbsp; Customers · Products · Orders</div>
+
+</div>
+
+<script>
+  function toggle(card) {
+    const btn = card.querySelector('.copy-btn');
+    if (btn && event.target === btn) return;
+    card.classList.toggle('open');
+  }
+
+  function copyCode(e, btn) {
+    e.stopPropagation();
+    const code = btn.nextElementSibling.innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'COPIED';
+      setTimeout(() => btn.textContent = 'COPY', 1500);
+    });
+  }
+</script>
+</body>
+</html>
