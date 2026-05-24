@@ -344,3 +344,29 @@ GROUP BY
     C.country
 ORDER BY
     avg_order_value DESC;
+-- 23 What is the total revenue per customer, including those with zero orders?
+SELECT
+    CONCAT(
+        C.firstname,
+        ' ',
+        C.lastname
+    ) AS customer_name,
+    C.country,
+    COALESCE(
+        SUM(
+            P.price * O.quantity
+        ),
+        0
+    ) AS total_revenue
+FROM
+    customers C
+    LEFT JOIN Orders O
+    ON C.CustomerID = O.CustomerID
+    LEFT JOIN Products P
+    ON O.ProductID = P.ProductID
+GROUP BY
+    C.CustomerID,
+    customer_name,
+    C.country
+ORDER BY
+    total_revenue DESC;
